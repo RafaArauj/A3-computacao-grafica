@@ -7,10 +7,30 @@ local players
 
 local function reset()
     players = {
-        Player.new(160, C.SH/2 - C.PH/2, {0.25, 0.55, 1},
-            {left="a", right="d", up="w", down="s"}),
-        Player.new(C.SW - 160 - C.PW, C.SH/2 - C.PH/2, {1, 0.3, 0.2},
-            {left="left", right="right", up="up", down="down"}),
+        Player.new(
+        160,
+        C.SH/2 - C.PH/2, 
+        {0.25, 0.55, 1},
+        {
+            left="a", 
+            right="d", 
+            up="w", 
+            down="s",
+            attack ="space",
+        }
+    ),
+        Player.new(
+        C.SW - 160 - C.PW, 
+        C.SH/2 - C.PH/2, 
+        {1, 0.3, 0.2},
+        {
+            left="left", 
+            right="right", 
+            up="up",  
+            down="0",
+            attack="down"
+        }
+    ),
     }
 end
 
@@ -40,6 +60,20 @@ function love.draw()
 end
 
 function love.keypressed(key)
-    if key == "r" then reset() end
-    if key == "escape" then love.event.quit() end
+    if key == players[1].keys.attack then
+    Player.attack(players[1])    
+    end    
+    
+
+    if key == players[2].keys.attack then
+        Player.attack(players[2])
+    end
+
+    if key == "r" then 
+        reset() 
+        end
+
+    if key == "escape" then 
+        love.event.quit() 
+        end
 end
