@@ -51,7 +51,6 @@ end
 
 function Player.attack(p)
     if p.attackTimer <= 0 then
-        print("ATAQUE")
         p.isAttacking = true
         p.attackTimer= 0.2
     end
