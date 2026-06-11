@@ -27,8 +27,8 @@ local function reset()
             left="left", 
             right="right", 
             up="up",  
-            down="0",
-            attack="down"
+            down="down",
+            attack="0"
         }
     ),
     }

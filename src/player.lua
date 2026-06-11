@@ -1,3 +1,4 @@
+--movimentação e estado do jogador
 local C = require("constants")
 
 local Player = {}
@@ -9,11 +10,21 @@ function Player.new(x, y, color, keys)
         hp = C.MAX_HP,
         color = color,
         keys = keys,
+
         dmgTimer = 0,
+
+        isAttacking = false,
+        attackTimer = 0
     }
 end
 
 function Player.update(p, dt)
+    if p.attackTimer> 0 then
+        p.attackTimer = p.attackTimer -dt
+    else 
+        p.isAttacking = false
+    end
+
     p.vx = 0
     p.vy = 0
     if love.keyboard.isDown(p.keys.left)  then p.vx = -C.SPEED end
@@ -38,4 +49,11 @@ function Player.isMoving(p)
     return p.vx ~= 0 or p.vy ~= 0
 end
 
+function Player.attack(p)
+    if p.attackTimer <= 0 then
+        print("ATAQUE")
+        p.isAttacking = true
+        p.attackTimer= 0.2
+    end
+end
 return Player

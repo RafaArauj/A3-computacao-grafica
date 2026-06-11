@@ -1,3 +1,4 @@
+--configurações 
 return {
     SW     = 900,
     SH     = 700,
