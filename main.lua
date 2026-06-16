@@ -26,17 +26,42 @@ local spritesDef = {
     },
     [2] = {  
         p1 = {
-            right = "src/assets/LadyKateP1R.png",  left  = "src/assets/LadyKateP1L.png",
-            walkR = "src/assets/LadyKateP1RW.png", walkL = "src/assets/LadyKateP1LW.png",
-            attackR = "src/assets/LadyKateP1RA.png", attackL = "src/assets/LadyKateP1LA.png",
+            right = "src/assets/LadyKateP1R.png",  
+            left  = "src/assets/LadyKateP1L.png",
+            walkR = "src/assets/LadyKateP1RW.png", 
+            walkL = "src/assets/LadyKateP1LW.png",
+            attackR = "src/assets/LadyKateP1RA.png", 
+            attackL = "src/assets/LadyKateP1LA.png",
         },
         p2 = { 
-            right = "src/assets/LadyKateP2R.png",  left  = "src/assets/LadyKateP2L.png",
-            walkR = "src/assets/LadyKateP2RW.png", walkL = "src/assets/LadyKateP2LW.png",
-            attackR = "src/assets/LadyKateP2RA.png", attackL = "src/assets/LadyKateP2LA.png",
+            right = "src/assets/LadyKateP2R.png",  
+            left  = "src/assets/LadyKateP2L.png",
+            walkR = "src/assets/LadyKateP2RW.png", 
+            walkL = "src/assets/LadyKateP2LW.png",
+            attackR = "src/assets/LadyKateP2RA.png", 
+            attackL = "src/assets/LadyKateP2LA.png",
         },
     },
+    [3] = {  
+        p1 = {
+            right = "src/assets/ratitoP1R.png",  
+            left  = "src/assets/ratitoP1L.png",
+            walkR = "src/assets/ratitoP1RW.png", 
+            walkL = "src/assets/ratitoP1LW.png",
+            attackR = "src/assets/ratitoP1RA.png", 
+            attackL = "src/assets/ratitoP1LA.png",
+        },
+        p2 = { 
+            right = "src/assets/ratitoP2R.png",  
+            left  = "src/assets/ratitoP2L.png",
+            walkR = "src/assets/ratitoP2RW.png", 
+            walkL = "src/assets/ratitoP2LW.png",
+            attackR = "src/assets/ratitoP2RA.png", 
+            attackL = "src/assets/ratitoP2LA.png",
+        },
+        },
 }
+local background
 
 local CharSelect = require("src.charselect")
 local gameState = "select"
@@ -44,6 +69,7 @@ local gameState = "select"
 function love.load()
     love.window.setTitle("Jogo")
     love.window.setMode(C.SW, C.SH, {resizable=false})
+    background = love.graphics.newImage("src/assets/parallax-forest-back-trees-1.png.png")
     CharSelect.load()
 end
 
@@ -66,7 +92,7 @@ function love.draw()
     if gameState == "select" then
         CharSelect.draw()
     else
-        UI.drawBackground()
+        UI.drawBackground(background)
         for i, p in ipairs(players) do
             UI.drawStickman(p)
             UI.drawHPBar(p, i)
@@ -124,7 +150,7 @@ function love.draw()
         CharSelect.draw()
         return
     end
-    UI.drawBackground()
+    UI.drawBackground(background)
     for i, p in ipairs(players) do
         UI.drawStickman(p)
         UI.drawHPBar(p, i)

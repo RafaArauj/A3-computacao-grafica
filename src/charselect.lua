@@ -4,6 +4,8 @@ local CharSelect = {}
 local characters = {
     { name = "Largartor", menu = "src/assets/lagartorMenu.png"},
     { name = "Lady Kate", menu = "src/assets/LadyKateMenu.png"},
+    { name = "Ratito", menu = "src/assets/RatitoMenu.png"},
+
 }
 
 local menuImgs = {}

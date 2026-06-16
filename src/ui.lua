@@ -2,9 +2,11 @@
 local C = require("constants")
 local UI = {}
 
-function UI.drawBackground()
-    love.graphics.setColor(0.12, 0.12, 0.16)
-    love.graphics.rectangle("fill", 0, 0, C.SW, C.SH)
+function UI.drawBackground(bg)
+    love.graphics.setColor(1, 1, 1)
+    local scaleX = C.SW / bg:getWidth()
+    local scaleY = C.SH / bg:getHeight()
+    love.graphics.draw(bg, 0, 0, 0, scaleX, scaleY)
 end
 
 function UI.drawStickman(p)
