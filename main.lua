@@ -5,61 +5,113 @@ local UI        = require("src.ui")
 
 local players
 
-local function reset()
-    --inicia carregando os sprites 
-    players = {
-        Player.new(
-        160,
-        C.SH/2 - C.PH/2, 
-        {0.25, 0.55, 1},
-        {
-            left="a", 
-            right="d", 
-            up="w", 
-            down="s",
-            attack ="space",
-        }
-    ),
-        Player.new(
-        C.SW - 160 - C.PW, 
-        C.SH/2 - C.PH/2, 
-        {1, 0.3, 0.2},
-        {
-            left="left", 
-            right="right", 
-            up="up",  
-            down="down",
-            attack="0"
-        }
-    ),
-    }
-    players[1].sprites = {
-    left      = love.graphics.newImage("src/assets/lagartorP1LI.png"),
-    right      = love.graphics.newImage("src/assets/lagartorP1RI.png"),
-    attackR   = love.graphics.newImage("src/assets/lagartorP1RA.png"),
-    attackL   = love.graphics.newImage("src/assets/lagartorP1LA.png"),
-    walkR = love.graphics.newImage("src/assets/lagartorP1R.png"),
-    walkL = love.graphics.newImage("src/assets/lagartorP1L.png"),
+local spritesDef = {
+    [1] = {
+        p1 = {
+        right = "src/assets/lagartorP1RI.png",
+        walkR = "src/assets/lagartorP1R.png",
+        attackR = "src/assets/lagartorP1RA.png",
+        left = "src/assets/lagartorP1LI.png",
+        walkL = "src/assets/lagartorP1L.png",
+        attackL = "src/assets/lagartorP1LA.png"
+    },
+    p2 = {
+        right = "src/assets/lagartorP2RI.png",
+        walkR = "src/assets/lagartorP2R.png",
+        attackR = "src/assets/lagartorP2RA.png",
+        left = "src/assets/lagartorP2LI.png",
+        walkL = "src/assets/lagartorP2L.png",
+        attackL = "src/assets/lagartorP2LA.png"
+        },
+    },
+    [2] = {  
+        p1 = {
+            right = "src/assets/LadyKateP1R.png",  left  = "src/assets/LadyKateP1L.png",
+            walkR = "src/assets/LadyKateP1RW.png", walkL = "src/assets/LadyKateP1LW.png",
+            attackR = "src/assets/LadyKateP1RA.png", attackL = "src/assets/LadyKateP1LA.png",
+        },
+        p2 = { 
+            right = "src/assets/LadyKateP2R.png",  left  = "src/assets/LadyKateP2L.png",
+            walkR = "src/assets/LadyKateP2RW.png", walkL = "src/assets/LadyKateP2LW.png",
+            attackR = "src/assets/LadyKateP2RA.png", attackL = "src/assets/LadyKateP2LA.png",
+        },
+    },
 }
-players[2].facing = "left"
- players[2].sprites = {
-    left = love.graphics.newImage("src/assets/lagartorP2LI.png"),
-    right = love.graphics.newImage("src/assets/lagartorP2RI.png"),
-    attackR = love.graphics.newImage("src/assets/lagartorP2RA.png"),
-    attackL = love.graphics.newImage("src/assets/lagartorP2LA.png"),
-    walkR = love.graphics.newImage("src/assets/lagartorP2R.png"),
-    walkL = love.graphics.newImage("src/assets/lagartorP2L.png"),
-    
-}
-end
+
+local CharSelect = require("src.charselect")
+local gameState = "select"
 
 function love.load()
     love.window.setTitle("Jogo")
     love.window.setMode(C.SW, C.SH, {resizable=false})
-    reset()
+    CharSelect.load()
+end
+
+local function loadSprites(def)
+    local s = {}
+    for k, path in pairs(def) do
+        s[k] = love.graphics.newImage(path)
+    end
+    return s
 end
 
 function love.update(dt)
+    if gameState ~= "game" then return end
+    if players[1].hp <= 0 or players[2].hp <= 0 then return end
+    for _, p in ipairs(players) do Player.update(p, dt) end
+    Collision.applyDamage(players[1], players[2])
+end
+
+function love.draw()
+    if gameState == "select" then
+        CharSelect.draw()
+    else
+        UI.drawBackground()
+        for i, p in ipairs(players) do
+            UI.drawStickman(p)
+            UI.drawHPBar(p, i)
+        end
+        UI.drawHints()
+        UI.drawGameOver(players)
+        love.graphics.setColor(1, 1, 1)
+    end
+end
+
+function love.keypressed(key)
+    if gameState == "select" then
+        CharSelect.keypressed(key)
+        if key == "r" and CharSelect.isReady() then
+            local choices = CharSelect.getChoices()
+            reset(choices)
+            gameState = "game"
+        end
+        return
+    end
+
+    if key == players[1].keys.attack then Player.attack(players[1]) end
+    if key == players[2].keys.attack then Player.attack(players[2]) end
+    if key == "r" then
+        gameState = "select"
+        CharSelect.reset()
+    end
+    if key == "escape" then love.event.quit() end
+end
+
+local function reset(choices)
+    players = {
+        Player.new(160, C.SH/2 - C.PH/2, {0.25,0.55,1}, {left="a",right="d",up="w",down="s",attack="space"}),
+        Player.new(C.SW-160-C.PW, C.SH/2 - C.PH/2, {1,0.3,0.2}, {left="left",right="right",up="up",down="down",attack="0"}),
+    }
+    players[2].facing = "left"
+    if choices then
+        players[1].sprites = loadSprites(spritesDef[choices[1].char][choices[1].variant])
+        players[2].sprites = loadSprites(spritesDef[choices[2].char][choices[2].variant])
+    end
+end
+
+
+function love.update(dt)
+    if gameState ~= "game" then return end
     if players[1].hp <= 0 or players[2].hp <= 0 then return end
     for _, p in ipairs(players) do
         Player.update(p, dt)
@@ -68,6 +120,10 @@ function love.update(dt)
 end
 
 function love.draw()
+    if gameState == "select" then
+        CharSelect.draw()
+        return
+    end
     UI.drawBackground()
     for i, p in ipairs(players) do
         UI.drawStickman(p)
@@ -79,20 +135,21 @@ function love.draw()
 end
 
 function love.keypressed(key)
-    if key == players[1].keys.attack then
-    Player.attack(players[1])    
-    end    
-    
-
-    if key == players[2].keys.attack then
-        Player.attack(players[2])
+    if gameState == "select" then
+        CharSelect.keypressed(key)
+        if CharSelect.isReady() then
+            local choices = CharSelect.getChoices()
+            reset(choices)
+            gameState = "game"
+        end
+        return
     end
 
-    if key == "r" then 
-        reset() 
-        end
-
-    if key == "escape" then 
-        love.event.quit() 
-        end
+    if key == players[1].keys.attack then Player.attack(players[1]) end
+    if key == players[2].keys.attack then Player.attack(players[2]) end
+    if key == "r" then
+        gameState = "select"
+        CharSelect.reset()
+    end
+    if key == "escape" then love.event.quit() end
 end
