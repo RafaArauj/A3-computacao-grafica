@@ -16,6 +16,9 @@ function Player.new(x, y, color, keys)
         walkTimer = 0,
         walkFrame = 0,
         onGround = true,
+        isBlocking = false,
+        isParrying = false,
+        parryTimer = 0,
     }
 end
 
@@ -34,6 +37,14 @@ function Player.update(p, dt)
 
     p.vy = p.vy + C.GRAVITY * dt
     
+    if p.parryTimer > 0 then
+    p.parryTimer = p.parryTimer - dt
+    else
+    p.isParrying = false
+    end
+
+    p.isBlocking = love.keyboard.isDown(p.keys.down)
+
     -- normaliza diagonal
     if p.vx ~= 0 or p.vy ~= 0 then
     p.walkTimer = p.walkTimer + dt
@@ -75,4 +86,10 @@ function Player.attack(p)
         p.attackTimer= 0.2
     end
 end
+
+function Player.parry(p)
+    p.isParrying = true
+    p.parryTimer = C.PARRY_WINDOW
+end
+
 return Player

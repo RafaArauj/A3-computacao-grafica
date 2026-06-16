@@ -105,6 +105,14 @@ function love.keypressed(key)
         Player.jump(players[2])
     end
 
+    if key == players[1].keys.down then
+        Player.parry(players[1])
+    end
+
+    if key == players[2].keys.down then
+        Player.parry(players[2])
+    end
+
     if key == "r" then 
         reset() 
         end
