@@ -10,7 +10,7 @@ local function reset()
     players = {
         Player.new(
         160,
-        C.SH/2 - C.PH/2, 
+        C.GROUND_Y,
         {0.25, 0.55, 1},
         {
             left="a", 
@@ -22,7 +22,7 @@ local function reset()
     ),
         Player.new(
         C.SW - 160 - C.PW, 
-        C.SH/2 - C.PH/2, 
+        C.GROUND_Y,
         {1, 0.3, 0.2},
         {
             left="left", 
@@ -55,7 +55,16 @@ end
 
 function love.load()
     love.window.setTitle("Jogo")
-    love.window.setMode(C.SW, C.SH, {resizable=false})
+
+    local width, height = love.window.getDesktopDimensions()
+
+    love.window.setMode(0, 0, {
+    fullscreen = true,
+    fullscreentype = "desktop"
+})
+C.SW = width
+C.SH = height
+
     reset()
 end
 
@@ -86,6 +95,14 @@ function love.keypressed(key)
 
     if key == players[2].keys.attack then
         Player.attack(players[2])
+    end
+
+    if key == players[1].keys.up then
+        Player.jump(players[1])
+    end
+
+    if key == players[2].keys.up then
+        Player.jump(players[2])
     end
 
     if key == "r" then 
