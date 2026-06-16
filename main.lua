@@ -6,6 +6,7 @@ local UI        = require("src.ui")
 local players
 
 local function reset()
+    --inicia carregando os sprites 
     players = {
         Player.new(
         160,
@@ -32,6 +33,24 @@ local function reset()
         }
     ),
     }
+    players[1].sprites = {
+    left      = love.graphics.newImage("src/assets/lagartorP1LI.png"),
+    right      = love.graphics.newImage("src/assets/lagartorP1RI.png"),
+    attackR   = love.graphics.newImage("src/assets/lagartorP1RA.png"),
+    attackL   = love.graphics.newImage("src/assets/lagartorP1LA.png"),
+    walkR = love.graphics.newImage("src/assets/lagartorP1R.png"),
+    walkL = love.graphics.newImage("src/assets/lagartorP1L.png"),
+}
+players[2].facing = "left"
+ players[2].sprites = {
+    left = love.graphics.newImage("src/assets/lagartorP2LI.png"),
+    right = love.graphics.newImage("src/assets/lagartorP2RI.png"),
+    attackR = love.graphics.newImage("src/assets/lagartorP2RA.png"),
+    attackL = love.graphics.newImage("src/assets/lagartorP2LA.png"),
+    walkR = love.graphics.newImage("src/assets/lagartorP2R.png"),
+    walkL = love.graphics.newImage("src/assets/lagartorP2L.png"),
+    
+}
 end
 
 function love.load()

@@ -1,6 +1,5 @@
 --movimentação e estado do jogador
 local C = require("constants")
-
 local Player = {}
 
 function Player.new(x, y, color, keys)
@@ -10,11 +9,12 @@ function Player.new(x, y, color, keys)
         hp = C.MAX_HP,
         color = color,
         keys = keys,
-
         dmgTimer = 0,
-
         isAttacking = false,
-        attackTimer = 0
+        attackTimer = 0,
+        facing = "right",
+        walkTimer = 0,
+        walkFrame = 0,
     }
 end
 
@@ -31,13 +31,20 @@ function Player.update(p, dt)
     if love.keyboard.isDown(p.keys.right) then p.vx =  C.SPEED end
     if love.keyboard.isDown(p.keys.up)    then p.vy = -C.SPEED end
     if love.keyboard.isDown(p.keys.down)  then p.vy =  C.SPEED end
-
+    if p.vx > 0 then p.facing = "right"
+    elseif p.vx < 0 then p.facing = "left" end
+    
     -- normaliza diagonal
-    if p.vx ~= 0 and p.vy ~= 0 then
-        local f = C.SPEED / math.sqrt(2 * C.SPEED * C.SPEED)
-        p.vx = p.vx * f
-        p.vy = p.vy * f
+    if p.vx ~= 0 or p.vy ~= 0 then
+    p.walkTimer = p.walkTimer + dt
+    if p.walkTimer >= 0.15 then
+        p.walkTimer = 0
+        p.walkFrame = 1 - p.walkFrame  -- alterna entre 0 e 1
     end
+else
+    p.walkTimer = 0
+    p.walkFrame = 0
+end
 
     p.x = math.max(0, math.min(C.SW - C.PW, p.x + p.vx * dt))
     p.y = math.max(0, math.min(C.SH - C.PH, p.y + p.vy * dt))

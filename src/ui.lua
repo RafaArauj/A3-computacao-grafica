@@ -1,6 +1,5 @@
 --desenho da interface
 local C = require("constants")
-
 local UI = {}
 
 function UI.drawBackground()
@@ -9,10 +8,24 @@ function UI.drawBackground()
 end
 
 function UI.drawStickman(p)
-    local cx = p.x + C.PW / 2
-    love.graphics.setColor(p.color)
-    love.graphics.rectangle("fill", p.x, p.y, C.PW, C.PH, 6)
-    love.graphics.circle("fill", cx, p.y - C.HEAD_R - 2, C.HEAD_R)
+    if not p.sprites then return end
+    local img
+    if p.isAttacking then
+        img = (p.facing == "right") and p.sprites.attackR or p.sprites.attackL
+    elseif p.vx ~= 0 or p.vy ~= 0 then
+        if p.walkFrame == 0 then
+            img = (p.facing == "right") and p.sprites.right or p.sprites.left
+        else
+            img = (p.facing == "right") and p.sprites.walkR or p.sprites.walkL
+        end
+    else
+        img = (p.facing == "right") and p.sprites.right or p.sprites.left
+    end
+    love.graphics.setColor(1, 1, 1)
+    local escala = 3
+    local scaleX = C.PW * escala / img:getWidth()
+    local scaleY = C.PH * escala / img:getHeight()
+    love.graphics.draw(img, p.x, p.y, 0, scaleX, scaleY)
 end
 
 function UI.drawHPBar(p, idx)
