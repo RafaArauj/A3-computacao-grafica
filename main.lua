@@ -2,130 +2,90 @@ local C         = require("constants")
 local Player    = require("src.player")
 local Collision = require("src.collision")
 local UI        = require("src.ui")
-local AI = require("src.ai")
-
-local players
-
-local function reset()
-    --inicia carregando os sprites 
-    players = {
-        Player.new(
-        160,
-        C.GROUND_Y,
-        {0.25, 0.55, 1},
-        {
-            left="a", 
-            right="d", 
-            up="w", 
-            down="s",
-            attack ="space",
-        }
-    ),
-        Player.new(
-        C.SW - 160 - C.PW, 
-        C.GROUND_Y,
-        {1, 0.3, 0.2},
-        {
-            left="left", 
-            right="right", 
-            up="up",  
-            down="down",
-            attack="0"
-        }
-    ),
-
-    }
-
-    players[2].isBot = true
-
-
-    players[1].sprites = {
-    left      = love.graphics.newImage("src/assets/lagartorP1LI.png"),
-    right      = love.graphics.newImage("src/assets/lagartorP1RI.png"),
-    attackR   = love.graphics.newImage("src/assets/lagartorP1RA.png"),
-    attackL   = love.graphics.newImage("src/assets/lagartorP1LA.png"),
-    walkR = love.graphics.newImage("src/assets/lagartorP1R.png"),
-    walkL = love.graphics.newImage("src/assets/lagartorP1L.png"),
-}
-players[2].facing = "left"
- players[2].sprites = {
-    left = love.graphics.newImage("src/assets/lagartorP2LI.png"),
-    right = love.graphics.newImage("src/assets/lagartorP2RI.png"),
-    attackR = love.graphics.newImage("src/assets/lagartorP2RA.png"),
-    attackL = love.graphics.newImage("src/assets/lagartorP2LA.png"),
-    walkR = love.graphics.newImage("src/assets/lagartorP2R.png"),
-    walkL = love.graphics.newImage("src/assets/lagartorP2L.png"),
-    
 local Effects   = require("src.effects")
 local Sounds    = require("src.sounds")
+local AI        = require("src.ai")
 
 local players
+local gameMode = 1
 
 local spritesDef = {
     [1] = {
         p1 = {
-            right   = "src/assets/lagartorP1RI.png",
-            walkR   = "src/assets/lagartorP1R.png",
-            attackR = "src/assets/lagartorP1RA.png",
-            left    = "src/assets/lagartorP1LI.png",
-            walkL   = "src/assets/lagartorP1L.png",
-            attackL = "src/assets/lagartorP1LA.png",
-            deathR  = "src/assets/lagartorP1RDeath.png",
-            deathL  = "src/assets/lagartorP1LDeath.png",
+            right    = "src/assets/lagartorP1RI.png",
+            walkR    = "src/assets/lagartorP1R.png",
+            attackR  = "src/assets/lagartorP1RA.png",
+            left     = "src/assets/lagartorP1LI.png",
+            walkL    = "src/assets/lagartorP1L.png",
+            attackL  = "src/assets/lagartorP1LA.png",
+            deathR   = "src/assets/lagartorP1RDeath.png",
+            deathL   = "src/assets/lagartorP1LDeath.png",
+            defenseR = "src/assets/lagartorP1RD.png",
+            defenseL = "src/assets/lagartorP1LD.png",
         },
         p2 = {
-            right   = "src/assets/lagartorP2RI.png",
-            walkR   = "src/assets/lagartorP2R.png",
-            attackR = "src/assets/lagartorP2RA.png",
-            left    = "src/assets/lagartorP2LI.png",
-            walkL   = "src/assets/lagartorP2L.png",
-            attackL = "src/assets/lagartorP2LA.png",
-            deathR  = "src/assets/lagartorDeathP2R.png",
-            deathL  = "src/assets/lagartorDeathP2L.png",
+            right    = "src/assets/lagartorP2RI.png",
+            walkR    = "src/assets/lagartorP2R.png",
+            attackR  = "src/assets/lagartorP2RA.png",
+            left     = "src/assets/lagartorP2LI.png",
+            walkL    = "src/assets/lagartorP2L.png",
+            attackL  = "src/assets/lagartorP2LA.png",
+            deathR   = "src/assets/lagartorDeathP2R.png",
+            deathL   = "src/assets/lagartorDeathP2L.png",
+            defenseR = "src/assets/lagartorP2RD.png",
+            defenseL = "src/assets/lagartorP2LD.png",
         },
     },
     [2] = {
         p1 = {
-            right   = "src/assets/LadyKateP1R.png",
-            left    = "src/assets/LadyKateP1L.png",
-            walkR   = "src/assets/LadyKateP1RW.png",
-            walkL   = "src/assets/LadyKateP1LW.png",
-            attackR = "src/assets/LadyKateP1RA.png",
-            attackL = "src/assets/LadyKateP1LA.png",
-            deathR  = "src/assets/LadyKateDeathP1R.png",
-            deathL  = "src/assets/LadyKateDeathP1L.png",
+            right    = "src/assets/LadyKateP1R.png",
+            left     = "src/assets/LadyKateP1L.png",
+            walkR    = "src/assets/LadyKateP1RW.png",
+            walkL    = "src/assets/LadyKateP1LW.png",
+            attackR  = "src/assets/LadyKateP1RA.png",
+            attackL  = "src/assets/LadyKateP1LA.png",
+            deathR   = "src/assets/LadyKateDeathP1R.png",
+            deathL   = "src/assets/LadyKateDeathP1L.png",
+            defenseR = "src/assets/LadyKateP1RD.png",
+            defenseL = "src/assets/LadyKateP1LD.png",
         },
         p2 = {
-            right   = "src/assets/LadyKateP2R.png",
-            left    = "src/assets/LadyKateP2L.png",
-            walkR   = "src/assets/LadyKateP2RW.png",
-            walkL   = "src/assets/LadyKateP2LW.png",
-            attackR = "src/assets/LadyKateP2RA.png",
-            attackL = "src/assets/LadyKateP2LA.png",
-            deathR  = "src/assets/LadyKateDeathP2R.png",
-            deathL  = "src/assets/LadyKateDeathP2L.png",
+            right    = "src/assets/LadyKateP2R.png",
+            left     = "src/assets/LadyKateP2L.png",
+            walkR    = "src/assets/LadyKateP2RW.png",
+            walkL    = "src/assets/LadyKateP2LW.png",
+            attackR  = "src/assets/LadyKateP2RA.png",
+            attackL  = "src/assets/LadyKateP2LA.png",
+            deathR   = "src/assets/LadyKateDeathP2R.png",
+            deathL   = "src/assets/LadyKateDeathP2L.png",
+            defenseR = "src/assets/LadyKateP2RD.png",
+            defenseL = "src/assets/LadyKateP2LD.png",
         },
     },
     [3] = {
         p1 = {
-            right   = "src/assets/ratitoP1R.png",
-            left    = "src/assets/ratitoP1L.png",
-            walkR   = "src/assets/ratitoP1RW.png",
-            walkL   = "src/assets/ratitoP1LW.png",
-            attackR = "src/assets/ratitoP1RA.png",
-            attackL = "src/assets/ratitoP1LA.png",
-            deathR  = "src/assets/ratitoP1RDeath.png",
-            deathL  = "src/assets/ratitoP1LDeath.png",
+            right    = "src/assets/ratitoP1R.png",
+            left     = "src/assets/ratitoP1L.png",
+            walkR    = "src/assets/ratitoP1RW.png",
+            walkL    = "src/assets/ratitoP1LW.png",
+            attackR  = "src/assets/ratitoP1RA.png",
+            attackL  = "src/assets/ratitoP1LA.png",
+            deathR   = "src/assets/ratitoP1RDeath.png",
+            deathL   = "src/assets/ratitoP1LDeath.png",
+            defenseR = "src/assets/ratitoP1RD.png",
+            defenseL = "src/assets/ratitoP1LD.png",
         },
         p2 = {
-            right   = "src/assets/ratitoP2R.png",
-            left    = "src/assets/ratitoP2L.png",
-            walkR   = "src/assets/ratitoP2RW.png",
-            walkL   = "src/assets/ratitoP2LW.png",
-            attackR = "src/assets/ratitoP2RA.png",
-            attackL = "src/assets/ratitoP2LA.png",
-            deathR  = "src/assets/ratitoP2RDeath.png",
-            deathL  = "src/assets/ratitoP2LDeath.png",
+            right    = "src/assets/ratitoP2R.png",
+            left     = "src/assets/ratitoP2L.png",
+            walkR    = "src/assets/ratitoP2RW.png",
+            walkL    = "src/assets/ratitoP2LW.png",
+            attackR  = "src/assets/ratitoP2RA.png",
+            attackL  = "src/assets/ratitoP2LA.png",
+            deathR   = "src/assets/ratitoP2RDeath.png",
+            deathL   = "src/assets/ratitoP2LDeath.png",
+            defenseR = "src/assets/ratitoP2RD.png",
+            defenseL = "src/assets/ratitoP2LD.png",
         },
     },
 }
@@ -188,21 +148,20 @@ local function reset(choices)
         players[1].sprites = loadSprites(spritesDef[choices[1].char][choices[1].variant])
         players[2].sprites = loadSprites(spritesDef[choices[2].char][choices[2].variant])
     end
+    players[2].isBot = (gameMode == 1)
 end
 
 function love.update(dt)
     if gameState ~= "game" then return end
     Effects.update(dt)
     if players[1].hp <= 0 or players[2].hp <= 0 then return end
-    for _, p in ipairs(players) do
-
-    if p.isBot then
-        AI.update(p, players[1], dt)
+    for i, p in ipairs(players) do
+        if p.isBot then
+            local opponent = (i == 1) and players[2] or players[1]
+            AI.update(p, opponent, dt)
+        end
+        Player.update(p, dt)
     end
-
-    Player.update(p, dt)
-
-end
     Collision.applyDamage(players[1], players[2])
 end
 
@@ -244,48 +203,27 @@ function love.keypressed(key)
 
     if gameState == "select" then
         CharSelect.keypressed(key)
+        if CharSelect.isP1Confirmed() and not CharSelect.isP2Active() then
+            CharSelect.confirmBot()
+        end
         if CharSelect.isReady() then
+            gameMode = CharSelect.isP2Active() and 2 or 1
             local choices = CharSelect.getChoices()
             reset(choices)
             gameState = "game"
-    if key == players[1].keys.attack then
-    Player.attack(players[1])    
-    end    
-    
-
-    if key == players[2].keys.attack then
-        Player.attack(players[2])
-    end
-
-    if key == players[1].keys.up then
-        Player.jump(players[1])
-    end
-
-    if key == players[2].keys.up then
-        Player.jump(players[2])
-    end
-
-    if key == players[1].keys.down then
-        Player.parry(players[1])
-    end
-
-    if key == players[2].keys.down then
-        Player.parry(players[2])
-    end
-
-    if key == "r" then 
-        reset() 
         end
         return
     end
 
-    if key == players[1].keys.attack then Player.attack(players[1]) end
-    if key == players[2].keys.attack then Player.attack(players[2]) end
-    if key == players[1].keys.up     then Player.jump(players[1])   end
-    if key == players[2].keys.up     then Player.jump(players[2])   end
+    if key == players[1].keys.attack and not players[1].isBot then Player.attack(players[1]) end
+    if key == players[2].keys.attack and not players[2].isBot then Player.attack(players[2]) end
+    if key == players[1].keys.up     and not players[1].isBot then Player.jump(players[1])   end
+    if key == players[2].keys.up     and not players[2].isBot then Player.jump(players[2])   end
+    if key == players[1].keys.down   and not players[1].isBot then Player.parry(players[1])  end
+    if key == players[2].keys.down   and not players[2].isBot then Player.parry(players[2])  end
     if key == "r" then
-        gameState = "select"
         CharSelect.reset()
+        gameState = "select"
     end
     if key == "escape" then love.event.quit() end
 end

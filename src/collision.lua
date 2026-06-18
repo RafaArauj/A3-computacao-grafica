@@ -42,34 +42,30 @@ local function hitEffect(attacker, victim)
     end
 
     if victim.hp <= 0 then
-    victim.isDead = true
+        victim.isDead = true
     end
 
     victim.hitFlash = 0.15
 end
 
 local function dealDamage(attacker, defender)
-    if attacker.isAttacking and attacker.dmgTimer <= 0 then
+    if not (attacker.isAttacking and attacker.dmgTimer <= 0) then return end
 
-        -- Parry
-        if defender.isParrying then
-            defender.isParrying = false
-            defender.parryTimer = 0
+    if defender.isParrying then
+        defender.isParrying = false
+        defender.parryTimer = 0
+        attacker.dmgTimer   = C.DMG_CD
+        Effects.shake(6, 0.2)
+        return
+    end
 
-            print("PARRY!")
-            attacker.dmgTimer = C.DMG_CD
-            return
-        end
+    local before = defender.hp
+    local damage = defender.isBlocking and math.floor(C.DAMAGE * C.BLOCK_MULT) or C.DAMAGE
+    defender.hp = math.max(0, defender.hp - damage)
+    attacker.dmgTimer = C.DMG_CD
 
-        -- Defesa
-        local damage = C.DAMAGE
-
-        if defender.isBlocking then
-            damage = damage * C.BLOCK_MULTIPLIER
-        end
-
-        defender.hp = math.max(0, defender.hp - damage)
-        attacker.dmgTimer = C.DMG_CD
+    if defender.hp < before then
+        hitEffect(attacker, defender)
     end
 end
 
@@ -81,27 +77,7 @@ function Collision.applyDamage(p1, p2)
 
     dealDamage(p1, p2)
     dealDamage(p2, p1)
-    if p1.isAttacking and p1.dmgTimer <= 0 then
-        local before = p2.hp
-        local dmg = p2.isDefending and math.floor(C.DAMAGE * C.DEF_MULT) or C.DAMAGE
-        p2.hp = math.max(0, p2.hp - dmg)
-        p1.dmgTimer = C.DMG_CD
-        if p2.hp < before then
-            hitEffect(p1, p2)
-        end
-    end
-
-    if p2.isAttacking and p2.dmgTimer <= 0 then
-        local before = p1.hp
-        local dmg = p1.isDefending and math.floor(C.DAMAGE * C.DEF_MULT) or C.DAMAGE
-        p1.hp = math.max(0, p1.hp - dmg)
-        p2.dmgTimer = C.DMG_CD
-        if p1.hp < before then
-            hitEffect(p2, p1)
-        end
-    end
 end
-    
 
 function Collision.attackBox(p)
     local reach = 30
@@ -109,7 +85,7 @@ function Collision.attackBox(p)
         x = p.x + C.PW,
         y = p.y,
         w = reach,
-        h = C.PH
+        h = C.PH,
     }
 end
 
