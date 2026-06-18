@@ -106,6 +106,17 @@ local function reset(choices)
         players[1].sprites = loadSprites(spritesDef[choices[1].char][choices[1].variant])
         players[2].sprites = loadSprites(spritesDef[choices[2].char][choices[2].variant])
     end
+
+    local width, height = love.window.getDesktopDimensions()
+
+    love.window.setMode(0, 0, {
+    fullscreen = true,
+    fullscreentype = "desktop"
+})
+C.SW = width
+C.SH = height
+
+    reset()
 end
 
 function love.update(dt)
@@ -148,6 +159,25 @@ function love.keypressed(key)
             local choices = CharSelect.getChoices()
             reset(choices)
             gameState = "game"
+    if key == players[1].keys.attack then
+    Player.attack(players[1])    
+    end    
+    
+
+    if key == players[2].keys.attack then
+        Player.attack(players[2])
+    end
+
+    if key == players[1].keys.up then
+        Player.jump(players[1])
+    end
+
+    if key == players[2].keys.up then
+        Player.jump(players[2])
+    end
+
+    if key == "r" then 
+        reset() 
         end
         return
     end
