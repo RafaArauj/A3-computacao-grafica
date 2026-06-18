@@ -19,6 +19,7 @@ function Player.new(x, y, color, keys)
         isBlocking = false,
         isParrying = false,
         parryTimer = 0,
+        isBot = false,
     }
 end
 
@@ -29,9 +30,21 @@ function Player.update(p, dt)
         p.isAttacking = false
     end
 
+    if not p.isBot then
+
     p.vx = 0
-    if love.keyboard.isDown(p.keys.left)  then p.vx = -C.SPEED end
-    if love.keyboard.isDown(p.keys.right) then p.vx =  C.SPEED end
+
+    if love.keyboard.isDown(p.keys.left) then
+        p.vx = -C.SPEED
+    end
+
+    if love.keyboard.isDown(p.keys.right) then
+        p.vx = C.SPEED
+    end
+
+    p.isBlocking = love.keyboard.isDown(p.keys.down)
+
+end
     if p.vx > 0 then p.facing = "right"
     elseif p.vx < 0 then p.facing = "left" end
 

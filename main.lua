@@ -2,6 +2,7 @@ local C         = require("constants")
 local Player    = require("src.player")
 local Collision = require("src.collision")
 local UI        = require("src.ui")
+local AI = require("src.ai")
 
 local players
 
@@ -32,7 +33,12 @@ local function reset()
             attack="0"
         }
     ),
+
     }
+
+    players[2].isBot = true
+
+
     players[1].sprites = {
     left      = love.graphics.newImage("src/assets/lagartorP1LI.png"),
     right      = love.graphics.newImage("src/assets/lagartorP1RI.png"),
@@ -71,8 +77,14 @@ end
 function love.update(dt)
     if players[1].hp <= 0 or players[2].hp <= 0 then return end
     for _, p in ipairs(players) do
-        Player.update(p, dt)
+
+    if p.isBot then
+        AI.update(p, players[1], dt)
     end
+
+    Player.update(p, dt)
+
+end
     Collision.applyDamage(players[1], players[2])
 end
 
