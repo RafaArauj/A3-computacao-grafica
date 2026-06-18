@@ -11,6 +11,9 @@ return {
     DMG_CD     = 0.4,
     GRAVITY    = 1000,
     JUMP_FORCE = -600,
+    GROUND_Y = 400,
+    BLOCK_MULTIPLIER = 0.3,
+    PARRY_WINDOW = 0.15,
     GROUND_Y   = 400,
     DEF_MULT   = 0.4,
 }

@@ -48,12 +48,39 @@ local function hitEffect(attacker, victim)
     victim.hitFlash = 0.15
 end
 
+local function dealDamage(attacker, defender)
+    if attacker.isAttacking and attacker.dmgTimer <= 0 then
+
+        -- Parry
+        if defender.isParrying then
+            defender.isParrying = false
+            defender.parryTimer = 0
+
+            print("PARRY!")
+            attacker.dmgTimer = C.DMG_CD
+            return
+        end
+
+        -- Defesa
+        local damage = C.DAMAGE
+
+        if defender.isBlocking then
+            damage = damage * C.BLOCK_MULTIPLIER
+        end
+
+        defender.hp = math.max(0, defender.hp - damage)
+        attacker.dmgTimer = C.DMG_CD
+    end
+end
+
 function Collision.applyDamage(p1, p2)
     Collision.push(p1, p2)
 
     local dist = math.abs((p1.x + C.PW) - p2.x)
     if dist > 10 then return end
 
+    dealDamage(p1, p2)
+    dealDamage(p2, p1)
     if p1.isAttacking and p1.dmgTimer <= 0 then
         local before = p2.hp
         local dmg = p2.isDefending and math.floor(C.DAMAGE * C.DEF_MULT) or C.DAMAGE
@@ -74,6 +101,7 @@ function Collision.applyDamage(p1, p2)
         end
     end
 end
+    
 
 function Collision.attackBox(p)
     local reach = 30
