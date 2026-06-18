@@ -83,7 +83,8 @@ function Collision.applyDamage(p1, p2)
     dealDamage(p2, p1)
     if p1.isAttacking and p1.dmgTimer <= 0 then
         local before = p2.hp
-        p2.hp = math.max(0, p2.hp - C.DAMAGE)
+        local dmg = p2.isDefending and math.floor(C.DAMAGE * C.DEF_MULT) or C.DAMAGE
+        p2.hp = math.max(0, p2.hp - dmg)
         p1.dmgTimer = C.DMG_CD
         if p2.hp < before then
             hitEffect(p1, p2)
@@ -92,7 +93,8 @@ function Collision.applyDamage(p1, p2)
 
     if p2.isAttacking and p2.dmgTimer <= 0 then
         local before = p1.hp
-        p1.hp = math.max(0, p1.hp - C.DAMAGE)
+        local dmg = p1.isDefending and math.floor(C.DAMAGE * C.DEF_MULT) or C.DAMAGE
+        p1.hp = math.max(0, p1.hp - dmg)
         p2.dmgTimer = C.DMG_CD
         if p1.hp < before then
             hitEffect(p2, p1)

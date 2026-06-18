@@ -9,20 +9,39 @@ function UI.drawBackground(bg)
     love.graphics.draw(bg, 0, 0, 0, scaleX, scaleY)
 end
 
+local function drawShadow(p)
+    local escala      = 3
+    local shadowCX    = p.x + C.PW * escala / 2
+    local shadowCY    = C.GROUND_Y + C.PH * escala
+
+    local distFromGround = math.max(0, C.GROUND_Y - p.y)
+    local t           = math.min(1, distFromGround / 200)
+
+    local rx    = 28 * (1 - t * 0.55)
+    local ry    = rx  * 0.28
+    local alpha = 0.38 * (1 - t * 0.65)
+
+    love.graphics.setColor(0, 0, 0, alpha)
+    love.graphics.ellipse("fill", shadowCX, shadowCY, rx, ry)
+    love.graphics.setColor(1, 1, 1)
+end
+
 function UI.drawStickman(p)
     if not p.sprites then return end
+
+    drawShadow(p)
 
     local img
 
     if p.isDead then
-    img = (p.facing == "right") and p.sprites.deathR or p.sprites.deathL
-    love.graphics.setColor(1, 1, 1)
-    local escala = 3
-    local scaleX = C.PW * escala / img:getWidth()
-    local scaleY = C.PH * escala / img:getHeight()
-    local drawH  = img:getHeight() * scaleY
-    love.graphics.draw(img, p.x, p.y + (C.PH * escala) - drawH, 0, scaleX, scaleY)
-    return
+        img = (p.facing == "right") and p.sprites.deathR or p.sprites.deathL
+        love.graphics.setColor(1, 1, 1)
+        local escala = 3
+        local scaleX = C.PW * escala / img:getWidth()
+        local scaleY = C.PH * escala / img:getHeight()
+        local drawH  = img:getHeight() * scaleY
+        love.graphics.draw(img, p.x, C.GROUND_Y + C.PH * escala - drawH, 0, scaleX, scaleY)
+        return
     end
 
     if p.hp <= 0 then
@@ -46,6 +65,8 @@ function UI.drawStickman(p)
     if flash > 0 then
         local t = flash / 0.15
         love.graphics.setColor(1, 1 - t, 1 - t, 1)
+    elseif p.isDefending then
+        love.graphics.setColor(0.4, 0.6, 1, 1)
     else
         love.graphics.setColor(1, 1, 1)
     end
