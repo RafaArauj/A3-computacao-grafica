@@ -15,6 +15,8 @@ function Player.new(x, y, color, keys)
         facing = "right",
         walkTimer = 0,
         walkFrame = 0,
+        hitFlash = 0,
+        isDead = false,
         onGround = true,
         isBlocking = false,
         isParrying = false,
@@ -45,6 +47,11 @@ function Player.update(p, dt)
     p.isBlocking = love.keyboard.isDown(p.keys.down)
 
 end
+    p.vy = 0
+    
+    if p.isDead then return end
+    if love.keyboard.isDown(p.keys.left)  then p.vx = -C.SPEED end
+    if love.keyboard.isDown(p.keys.right) then p.vx =  C.SPEED end
     if p.vx > 0 then p.facing = "right"
     elseif p.vx < 0 then p.facing = "left" end
 
@@ -87,6 +94,7 @@ function Player.jump(p)
 end
 
     if p.dmgTimer > 0 then p.dmgTimer = p.dmgTimer - dt end
+    if p.hitFlash > 0 then p.hitFlash = p.hitFlash - dt end
 end
 
 function Player.isMoving(p)
