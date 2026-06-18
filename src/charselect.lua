@@ -69,7 +69,9 @@ function CharSelect.draw()
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("Selecione o personagem", 0, 40, C.SW, "center")
-    love.graphics.printf("P1: A/D + Esaço       p2: Setas + 0", 0, 65, C.SW, "center")
+    love.graphics.printf("P1: A/D + Espaco       P2: Setas + 0", 0, 65, C.SW, "center")
+    love.graphics.setColor(0.5, 0.5, 0.6)
+    love.graphics.printf("F11: alternar tela cheia", 0, 90, C.SW, "center")
 
     local boxW, boxH = 160, 160
     local spacing = 40

@@ -60,7 +60,7 @@ function Effects.update(dt)
         else
             pt.x  = pt.x  + pt.vx * dt
             pt.y  = pt.y  + pt.vy * dt
-            pt.vy = pt.vy + 500 * dt  -- gravidade
+            pt.vy = pt.vy + 500 * dt  
         end
     end
 end

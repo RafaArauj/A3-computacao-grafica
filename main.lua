@@ -82,7 +82,7 @@ local gameState  = "select"
 
 function love.load()
     love.window.setTitle("Jogo")
-    love.window.setMode(C.SW, C.SH, {resizable=false})
+    love.window.setMode(C.SW, C.SH, {resizable = true})
     background = love.graphics.newImage("src/assets/parallax-forest-back-trees-1.png.png")
     Sounds.load()
     CharSelect.load()
@@ -96,27 +96,44 @@ local function loadSprites(def)
     return s
 end
 
+local function applyScreenSize()
+    C.SW, C.SH = love.graphics.getDimensions()
+    C.GROUND_Y = C.SH - 180
+end
+
+local function toggleFullscreen()
+    local isFS = love.window.getFullscreen()
+    if isFS then
+        love.window.setMode(800, 600, {resizable = true})
+    else
+        local w, h = love.window.getDesktopDimensions()
+        love.window.setMode(w, h, {fullscreen = true, fullscreentype = "desktop"})
+    end
+    applyScreenSize()
+    if players then
+        for _, p in ipairs(players) do
+            p.x = math.max(0, math.min(C.SW - C.PW, p.x))
+            if p.y > C.GROUND_Y then p.y = C.GROUND_Y end
+        end
+        players[2].x = math.max(players[1].x + C.PW + 1, players[2].x)
+    end
+end
+
 local function reset(choices)
+    applyScreenSize()
+
     players = {
-        Player.new(160, C.SH/2 - C.PH/2, {0.25,0.55,1}, {left="a",right="d",up="w",down="s",attack="space"}),
-        Player.new(C.SW-160-C.PW, C.SH/2 - C.PH/2, {1,0.3,0.2}, {left="left",right="right",up="up",down="down",attack="0"}),
+        Player.new(160, C.SH / 2 - C.PH / 2, {0.25, 0.55, 1},
+            {left = "a", right = "d", up = "w", down = "s", attack = "space"}),
+        Player.new(C.SW - 160 - C.PW, C.SH / 2 - C.PH / 2, {1, 0.3, 0.2},
+            {left = "left", right = "right", up = "up", down = "down", attack = "0"}),
     }
     players[2].facing = "left"
+
     if choices then
         players[1].sprites = loadSprites(spritesDef[choices[1].char][choices[1].variant])
         players[2].sprites = loadSprites(spritesDef[choices[2].char][choices[2].variant])
     end
-
-    local width, height = love.window.getDesktopDimensions()
-
-    love.window.setMode(0, 0, {
-    fullscreen = true,
-    fullscreentype = "desktop"
-})
-C.SW = width
-C.SH = height
-
-    reset()
 end
 
 function love.update(dt)
@@ -152,38 +169,33 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
 end
 
+function love.resize(w, h)
+    applyScreenSize()
+    if players then
+        for _, p in ipairs(players) do
+            p.x = math.max(0, math.min(C.SW - C.PW, p.x))
+            if p.y > C.GROUND_Y then p.y = C.GROUND_Y end
+        end
+    end
+end
+
 function love.keypressed(key)
+    if key == "f11" then toggleFullscreen() return end
+
     if gameState == "select" then
         CharSelect.keypressed(key)
         if CharSelect.isReady() then
             local choices = CharSelect.getChoices()
             reset(choices)
             gameState = "game"
-    if key == players[1].keys.attack then
-    Player.attack(players[1])    
-    end    
-    
-
-    if key == players[2].keys.attack then
-        Player.attack(players[2])
-    end
-
-    if key == players[1].keys.up then
-        Player.jump(players[1])
-    end
-
-    if key == players[2].keys.up then
-        Player.jump(players[2])
-    end
-
-    if key == "r" then 
-        reset() 
         end
         return
     end
 
     if key == players[1].keys.attack then Player.attack(players[1]) end
     if key == players[2].keys.attack then Player.attack(players[2]) end
+    if key == players[1].keys.up     then Player.jump(players[1])   end
+    if key == players[2].keys.up     then Player.jump(players[2])   end
     if key == "r" then
         gameState = "select"
         CharSelect.reset()
