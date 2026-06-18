@@ -19,8 +19,8 @@ Execute o comando acima dentro da pasta `A3-computacao-grafica`, ou arraste a pa
 
 ## Personagens
 
-| # | Nome | Descrição |
-|---|------|-----------|
+| # | Nome |
+|---|------|
 | 1 | **Largartor** |
 | 2 | **Lady Kate** | 
 | 3 | **Ratito** | 
