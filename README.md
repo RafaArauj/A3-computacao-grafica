@@ -21,9 +21,9 @@ Execute o comando acima dentro da pasta `A3-computacao-grafica`, ou arraste a pa
 
 | # | Nome | Descrição |
 |---|------|-----------|
-| 1 | **Largartor** | Personagem reptiliano |
-| 2 | **Lady Kate** | Combatente ágil |
-| 3 | **Ratito** | Pequeno e veloz |
+| 1 | **Largartor** |
+| 2 | **Lady Kate** | 
+| 3 | **Ratito** | 
 
 Cada personagem possui sprites originais para todos os estados e direções.
 
